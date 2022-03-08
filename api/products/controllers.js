@@ -1,4 +1,4 @@
-const Product = require('../../models/Product');
+const Product = require("../../models/Product");
 
 exports.fetchProduct = async (productId, next) => {
   try {
@@ -18,19 +18,6 @@ exports.getProducts = async (req, res) => {
   }
 };
 
-exports.productCreate = async (req, res) => {
-  try {
-    if (req.file) {
-      req.body.image = `/${req.file.path}`;
-      req.body.image = req.body.image.replace('\\', '/');
-    }
-    const newProduct = await Product.create(req.body);
-    return res.status(201).json(newProduct);
-  } catch (error) {
-    next(error);
-  }
-};
-
 exports.productDelete = async (req, res, next) => {
   try {
     await req.product.remove();
@@ -43,15 +30,16 @@ exports.productDelete = async (req, res, next) => {
 exports.productUpdate = async (req, res, next) => {
   try {
     if (req.file) {
-      req.body.image = `/${req.file.path}`;
-      req.body.image = req.body.image.replace('\\', '/');
+      req.body.image = `${req.method} ${req.protocol}://${req.get("host")}${
+        req.originalUrl
+      }/${req.file.path}`;
     }
     const product = await Product.findByIdAndUpdate(
       { _id: req.product.id },
       req.body,
       { new: true, runValidators: true } // returns the updated product
     );
-    res.status(204).end();
+    res.status(200).json(product);
   } catch (err) {
     next(error);
   }
